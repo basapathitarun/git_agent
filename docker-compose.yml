@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: github_agent_app
+    depends_on:
+      - qdrant
+      - db
+    environment:
+      - QDRANT_URL=http://qdrant:6333
+      - DATABASE_URL=postgresql+psycopg2://github:github123@db:5432/github_agent
+      # Pass through other sensitive keys if they exist in .env or shell
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    volumes:
+      - .:/app
+      # persistence for reports if needed
+      - ./reports:/app/reports
+
+  qdrant:
+    image: qdrant/qdrant
+    container_name: github_agent_qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  db:
+    image: postgres:15
+    container_name: github_agent_db
+    environment:
+      POSTGRES_USER: github
+      POSTGRES_PASSWORD: github123
+      POSTGRES_DB: github_agent
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  qdrant_data:
+  postgres_data:

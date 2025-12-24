@@ -1,0 +1,9 @@
+burr
+qdrant-client
+llama-index
+llama-index-vector-stores-qdrant
+llama-index-embeddings-openai
+sqlalchemy
+psycopg2-binary
+pydantic-settings
+requests
